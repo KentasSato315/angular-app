@@ -1,0 +1,27 @@
+.container {
+    background-color: white;
+    padding: 20px;
+  }
+  .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    width:  400px;
+  }
+  label {
+    width: 100px; /* ラベルの幅を設定 */
+    text-align: right;
+    font-size: 0.8em;
+    margin-right: 10px;
+  }
+  input {
+    flex: 1;
+    padding: 5px;
+  }
+  button {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 0.9em;
+    border: none;
+  }
