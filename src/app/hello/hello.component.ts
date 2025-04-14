@@ -1,37 +1,36 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
-import { MyCheckService, DataType } from '../mycheck.service';
-import { CommonModule } from '@angular/common';
+import { Component, signal, effect, Signal, computed } from '@angular/core';
 
 @Component({
   selector: 'app-hello',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './hello.component.html',
   styleUrls: ['./hello.component.css']
 })
-export class HelloComponent implements OnInit, OnDestroy{
-  title: string = 'my-app';
-  message: string = 'Hello World!. ';
-  private data$: Observable<DataType> | undefined;
-  private subscription: Subscription;
+export class HelloComponent {
+  title: string = 'hello-app';
+  message: string = 'Signal sample';
+  count = signal(0);
+  total = computed(() => {
+    let total = 0;
+    for (let i = 0; i <= this.count(); i++) {
+      total += i;
+    }
+    return total;
+  });
 
-  constructor(private myCheckService: MyCheckService) {
-    this.data$ = myCheckService.post$;
-    this.subscription = myCheckService.post$.subscribe((data: DataType) => {
-      console.log(data);
-      this.message = JSON.stringify(data, null ,2);
+  constructor() {
+    // エフェクトの定義：メッセージリストの変化を監視
+    effect(() => {
+      console.log('count:', this.count());
+    });
+    effect(() => {
+      console.log('total:', this.total());
+      this.message = 'total:' + this.total();
     });
   }
   
-  ngOnInit(): void {}
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }
-
-  onGet(id: number): void {
-    this.message = 'Loading...';
-    this.myCheckService.getData(id);
+  calc(n:number) {
+    this.count.set(n);
   }
 }
