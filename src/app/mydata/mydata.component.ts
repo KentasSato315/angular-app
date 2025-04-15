@@ -1,8 +1,4 @@
-import { Component, input, output } from '@angular/core';
-
-function triming(value: string): string {
-  return value.trim().toUpperCase();
-}
+import { Component, signal } from '@angular/core';
 
 @Component({
   selector: 'app-mydata',
@@ -12,14 +8,7 @@ function triming(value: string): string {
   styleUrl: './mydata.component.css'
 })
 export class MydataComponent {
-  message = input<string>();
-  onMessageChange = output<string>();
+  title = 'Mydata-app';
+  message = signal("これは、Mydataのmessageです。");
   constructor(){}
-
-  setMessage() {
-    const newMsg = prompt("Enter message:");
-    if (newMsg) {
-      this.onMessageChange.emit(newMsg);
-    }
-  }
 }

@@ -1,36 +1,70 @@
-import { Component, signal, effect, Signal, computed } from '@angular/core';
+import { Component, contentChild, ContentChild, ViewChild } from '@angular/core';
 
+// custom-valueコンポーネント
+@Component({
+  selector: 'custom-value',
+  standalone: true,
+  imports: [],
+  template: `<div style="border: 1px gray solid; padding: 1px 10px;">
+  <h4 style="margin: 10px 0px;">custom-value</h4>
+  [value]:{{text}}</div>
+  <ng-content />`
+})
+export class CustomValue {
+  text: string = 'value:' + Math.floor(Math.random() * 1000);
+}
+
+// custom-expandコンポーネント
+@Component({
+  selector: 'custom-expand',
+  standalone: true,
+  imports: [],
+  template: `
+    <div style="border: 1px gray solid; padding: 1px 10px;">
+      <h3 style="margin: 10px 0px;">custom-expand</h3>
+      <p>[text]: {{text}}</p>
+      <ng-content />
+    </div>`
+})
+export class CustomExpand {
+  @ContentChild(CustomValue) value: CustomValue | undefined;
+  text = 'expand!';
+
+  ngAfterContentInit() {
+    console.log(this.value?.text);
+    this.text = this.value!.text;
+  }
+
+  change(str:string) {
+    this.text = str;
+    this.value!.text = str;
+  }
+}
+
+// helloコンポーネント
 @Component({
   selector: 'app-hello',
   standalone: true,
-  imports: [],
+  imports: [CustomExpand,CustomValue],
+  providers: [],
   templateUrl: './hello.component.html',
-  styleUrls: ['./hello.component.css']
+  styleUrl: './hello.component.css',
 })
 export class HelloComponent {
-  title: string = 'hello-app';
-  message: string = 'Signal sample';
-  count = signal(0);
-  total = computed(() => {
-    let total = 0;
-    for (let i = 0; i <= this.count(); i++) {
-      total += i;
-    }
-    return total;
-  });
+  title = 'hello-app';
+  message = 'View child sample.';
+  @ViewChild(CustomExpand)
+  expand: CustomExpand | undefined;
 
-  constructor() {
-    // エフェクトの定義：メッセージリストの変化を監視
-    effect(() => {
-      console.log('count:', this.count());
-    });
-    effect(() => {
-      console.log('total:', this.total());
-      this.message = 'total:' + this.total();
-    });
+  ngAfterViewInit() {
+    console.log(this.expand?.text);
   }
-  
-  calc(n:number) {
-    this.count.set(n);
+
+  doit() {
+    const res = prompt("new value:");
+    if (res) {
+      this.message = this.expand?.text || 'undefined';
+      this.expand!.change(res);
+    }
   }
 }
